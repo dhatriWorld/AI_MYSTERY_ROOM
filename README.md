@@ -6,7 +6,7 @@ AI Mystery Room is an AI-powered interactive detective game where users create m
 
 Powered by **Google Gemini** and built using the **MERN stack**, the platform transforms a simple scenario into an immersive investigation experience.
 
-## Deployed Link : https://ai-mystery-room-9r6h.onrender.com/
+Deployed Link : https://ai-mystery-room-9r6h.onrender.com/
 
 ## ✨ Features
 
