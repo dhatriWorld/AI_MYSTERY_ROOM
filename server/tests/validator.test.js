@@ -1,0 +1,11 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { validateCase } from '../src/ai/validators/case.js';
+import { publicCase } from '../src/services/caseService.js';
+const person=(suspectId,name)=>({suspectId,name,role:'Guest',background:'Known to the household.',motive:'A plausible reason.',alibi:'Was elsewhere.',relationships:[],publicDescription:'A member of the party.'});
+const item=(evidenceId)=>({evidenceId,type:'clue',title:'Record',description:'A timestamped record.',source:'Office',content:{text:'A useful detail.'},relatedSuspectIds:['S-01'],relatedEvidenceIds:[],tags:[]});
+const fixture={title:'The Quiet Gallery',description:'A painting vanished.',briefing:'Three guests were nearby.',setting:{location:'Ash House',period:'A winter evening',incidentTime:'9:10 PM'},suspects:[person('S-01','Ada Vale'),person('S-02','Ben Orr'),person('S-03','Cleo Moss')],timeline:[{time:'9:10 PM',event:'The painting was noticed missing.'}],evidence:[item('E-01'),item('E-02')],solution:{culpritSuspectId:'S-01',motive:'Protect her work.',method:'Removed it.',opportunity:'Was alone.',decisiveEvidenceIds:['E-01','E-02'],reasoning:'Two clues align.',suspectEliminations:[{suspectId:'S-02',explanation:'No access.'},{suspectId:'S-03',explanation:'Was outside.'}],revealExplanation:'Ada used the service door.'}};
+test('accepts a well-formed case with valid references',()=>assert.equal(validateCase(fixture,{suspectCount:3,evidenceCount:2}).solution.culpritSuspectId,'S-01'));
+test('rejects a case with a missing decisive clue',()=>{const bad=structuredClone(fixture);bad.solution.decisiveEvidenceIds=['E-01','E-99'];assert.throws(()=>validateCase(bad,{suspectCount:3,evidenceCount:2}),/missing decisive evidence/);});
+test('rejects unexpected suspect counts',()=>assert.throws(()=>validateCase(fixture,{suspectCount:4,evidenceCount:2}),/unexpected number/));
+test('public case serialization does not include the solution',()=>{const result=publicCase({_id:'case-id',...fixture,caseCode:'MR-TEST',premise:'A premise',genre:'theft',difficulty:'medium',status:'ready'});assert.equal(result.title,fixture.title);assert.equal(Object.hasOwn(result,'solution'),false);});

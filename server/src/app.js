@@ -1,0 +1,16 @@
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import { rateLimit } from 'express-rate-limit';
+import { randomUUID } from 'node:crypto';
+import cases from './routes/cases.js';
+import { errorHandler, notFound } from './middleware/errors.js';
+const app=express();
+app.use(helmet());
+app.use(cors({origin:process.env.CLIENT_URL||'http://localhost:5173',allowedHeaders:['Content-Type','x-session-id']}));
+app.use(express.json({limit:'32kb'}));
+app.use((req,res,next)=>{if(req.path==='/api/v1/health')return next();const id=req.get('x-session-id');if(!id||!/^[0-9a-f-]{36}$/i.test(id))return res.status(400).json({success:false,error:{code:'INVALID_SESSION',message:'A valid guest session is required.'}});req.sessionId=id;next();});
+app.get('/api/v1/health',(req,res)=>res.json({success:true,data:{status:'ok'}}));
+app.use('/api/v1/cases',rateLimit({windowMs:60_000,limit:15,standardHeaders:true,legacyHeaders:false}),cases);
+app.use(notFound);app.use(errorHandler);
+export default app;
