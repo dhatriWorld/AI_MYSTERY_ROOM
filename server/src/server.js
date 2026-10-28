@@ -11,7 +11,7 @@ try {
 
   console.log('MongoDB connected successfully!');
 
-  app.listen(port, () => {
+  app.listen(port, '0.0.0.0', () => {
     console.log(`AI Mystery Room API listening on ${port}`);
   });
 } catch (error) {

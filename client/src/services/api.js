@@ -1,4 +1,4 @@
-const base = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api/v1';
+const base = import.meta.env.VITE_API_BASE_URL || '/api/v1';
 const SESSION_KEY = 'mystery-room-session';
 export function getSessionId() {
   let id = localStorage.getItem(SESSION_KEY);
